@@ -14,6 +14,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import Counter from './components/counter';
 import Controls from './components/controls';
 import reducers from './reducers';
+import Page from './components/front_page';
 
 const About = (props) => {
   return <div> All there is to know about me </div>;
@@ -56,6 +57,7 @@ const App = (props) => {
         </Switch>
         <Counter />
         <Controls />
+        <Page />
       </div>
     </Router>
   );
