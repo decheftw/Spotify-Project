@@ -32,9 +32,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ResultsGrid(props) {
+export default function NomsList(props) {
   const classes = useStyles();
   const [rating, setRating] = useState('No Rating Found');
+  console.log(props);
   let {
     // eslint-disable-next-line prefer-const
     title, poster, year, id, noms, setNoms,
@@ -45,9 +46,12 @@ export default function ResultsGrid(props) {
 
   function buttonOnClick() {
     const tempNoms = [...noms];
-    tempNoms.push({
-      title, poster, year, id,
-    });
+    let i = 0;
+    for (i; i < tempNoms.length; i += 1) {
+      if (tempNoms[i].id === id) {
+        tempNoms.splice(i, 1);
+      }
+    }
     setNoms(tempNoms);
   }
 
