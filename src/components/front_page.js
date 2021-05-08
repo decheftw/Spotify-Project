@@ -8,6 +8,7 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
+import Modal from '@material-ui/core/Modal';
 import ResultsGrid from './results';
 import NomsList from './nominations';
 
@@ -17,6 +18,7 @@ function Page() {
   const [pages, setPages] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [noms, setNoms] = useState([]);
+  const [openBanner, setOpenBanner] = useState(false);
   const [data, setData] = useState({
     Search: [
       {
@@ -40,7 +42,9 @@ function Page() {
   }, [search, page]);
 
   useEffect(() => {
-    console.log(noms);
+    if (noms.length === 5) {
+      setOpenBanner(true);
+    }
   }, [noms]);
 
   function onSearchChange(event) {
@@ -58,6 +62,25 @@ function Page() {
 
   function closeDrawer() {
     setDrawerOpen(false);
+  }
+
+  function closeBanner() {
+    setOpenBanner(false);
+  }
+
+  function viewNomsButton() {
+    closeBanner();
+    openDrawer();
+  }
+
+  function generateModalBody() {
+    return (
+      <div>
+        <h1>That&aposs your 5th nomination!</h1>
+        <Button variant="contained" onClick={closeBanner}>Cool!</Button>
+        <Button variant="contained" onClick={viewNomsButton}>View my nominations</Button>
+      </div>
+    );
   }
 
   function populateNomsList() {
@@ -80,6 +103,14 @@ function Page() {
       <h1>Shoppies Nominations</h1>
       <TextField id="outlined-basic" label="Search" variant="outlined" onChange={onSearchChange} />
       <Button variant="contained" onClick={openDrawer}>{`Nominations: ${noms.length}/5`}</Button>
+      <Modal
+        open={openBanner}
+        onClose={closeBanner}
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+      >
+        {generateModalBody()}
+      </Modal>
       <SwipeableDrawer
         anchor="top"
         open={drawerOpen}
