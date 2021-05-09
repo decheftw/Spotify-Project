@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-filename-extension */
 import React, { useState, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
@@ -9,11 +8,20 @@ import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
+import { makeStyles } from '@material-ui/core/styles';
 import ResultsGrid from './results';
 import NomsList from './nominations';
 import { getNominationLeaders, submitNoms } from '../services/firebase';
+import LeaderboardComp from './leaderboard';
+
+const useStyles = makeStyles(() => ({
+  pagination: {
+    float: 'flex-end',
+  },
+}));
 
 function Page() {
+  const classes = useStyles();
   const [search, setSearch] = useState('Whiplash');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -22,7 +30,8 @@ function Page() {
   const [noms, setNoms] = useState([]);
   const [openBanner, setOpenBanner] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState();
-  const [leaderboard, setLeaderboard] = useState();
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [data, setData] = useState({
     Search: [
       {
@@ -169,11 +178,21 @@ function Page() {
     setSubmittedOpen(false);
   }
 
+  function openLeaderboard() {
+    setLeaderboardOpen(true);
+  }
+
+  function closeLeaderboard() {
+    setLeaderboardOpen(false);
+  }
+
   return (
     <div className="App">
       <h1>Shoppies Nominations</h1>
       <TextField id="outlined-basic" label="Search" variant="outlined" onChange={onSearchChange} />
       <Button variant="contained" onClick={openDrawer}>{`Nominations: ${noms.length}/5`}</Button>
+      <Button variant="contained" onClick={openLeaderboard}>Leaderboard</Button>
+
       <Modal
         open={openBanner}
         onClose={closeBanner}
@@ -200,10 +219,23 @@ function Page() {
           Submission received!
         </h1>
       </SwipeableDrawer>
-      <pre>
-        <Pagination count={pages} page={page} onChange={handlePageChange} />
+      <SwipeableDrawer
+        anchor="top"
+        open={leaderboardOpen}
+        onClose={closeLeaderboard}
+        onOpen={openLeaderboard}
+      >
+        <IconButton aria-label="delete" onClick={closeLeaderboard}>
+          <CloseIcon />
+        </IconButton>
+        {leaderboard.map((nom) => (<LeaderboardComp title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} id={nom.id} votes={nom.votes} />))}
+      </SwipeableDrawer>
+      <div>
+        <div className={classes.pagination}>
+          <Pagination count={pages} page={page} onChange={handlePageChange} />
+        </div>
         {data.Search.map((res) => (<ResultsGrid title={res.Title} poster={res.Poster} year={res.Year} key={res.imdbID} noms={noms} setNoms={setNoms} id={res.imdbID} />))}
-      </pre>
+      </div>
     </div>
   );
 }
