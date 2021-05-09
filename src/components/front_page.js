@@ -11,14 +11,18 @@ import IconButton from '@material-ui/core/IconButton';
 import Modal from '@material-ui/core/Modal';
 import ResultsGrid from './results';
 import NomsList from './nominations';
+import { getNominationLeaders, submitNoms } from '../services/firebase';
 
 function Page() {
   const [search, setSearch] = useState('Whiplash');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [submittedOpen, setSubmittedOpen] = useState(false);
   const [noms, setNoms] = useState([]);
   const [openBanner, setOpenBanner] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState();
+  const [leaderboard, setLeaderboard] = useState();
   const [data, setData] = useState({
     Search: [
       {
@@ -46,6 +50,27 @@ function Page() {
       setOpenBanner(true);
     }
   }, [noms]);
+
+  useEffect(() => {
+    const tempLeaderboard = [];
+    console.log(leaderboardData);
+    // eslint-disable-next-line guard-for-in
+    for (const key in leaderboardData) {
+      tempLeaderboard.push(leaderboardData[key]);
+    }
+    tempLeaderboard.sort((a, b) => {
+      return b.votes - a.votes;
+    });
+    setLeaderboard(tempLeaderboard.splice(0, 5));
+  }, [leaderboardData]);
+
+  useEffect(() => {
+    console.log(leaderboard);
+  }, [leaderboard]);
+
+  useEffect(() => {
+    getNominationLeaders().then((res) => setLeaderboardData(res));
+  }, []);
 
   function onSearchChange(event) {
     setSearch(event.target.value);
@@ -83,6 +108,24 @@ function Page() {
     );
   }
 
+  function onSubmitClick() {
+    const tempData = JSON.parse(JSON.stringify(leaderboardData));
+    noms.forEach((nom) => {
+      if (nom.id in tempData) {
+        const count = tempData[nom.id].votes + 1;
+        tempData[nom.id].votes = count;
+      } else {
+        tempData[nom.id] = nom;
+        tempData[nom.id].votes = 1;
+      }
+    });
+    setLeaderboardData(tempData);
+    submitNoms(tempData);
+    setNoms([]);
+    setDrawerOpen(false);
+    setSubmittedOpen(true);
+  }
+
   function populateNomsList() {
     if (noms.length < 1) {
       return (
@@ -90,12 +133,40 @@ function Page() {
       );
     } else {
       console.log(noms);
-      return (
-        <div>
-          {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
-        </div>
-      );
+      if (noms.length === 5) {
+        return (
+          <div>
+            <IconButton aria-label="delete" onClick={closeDrawer}>
+              <CloseIcon />
+            </IconButton>
+            <Button variant="contained" onClick={onSubmitClick}>Submit</Button>
+            <div>
+              {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
+            </div>
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            <IconButton aria-label="delete" onClick={closeDrawer}>
+              <CloseIcon />
+            </IconButton>
+            <Button variant="disabled">{`Nominations: ${noms.length}/5`}</Button>
+            <div>
+              {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
+            </div>
+          </div>
+        );
+      }
     }
+  }
+
+  function openSubmitted() {
+    setSubmittedOpen(true);
+  }
+
+  function closeSubmitted() {
+    setSubmittedOpen(false);
   }
 
   return (
@@ -117,14 +188,21 @@ function Page() {
         onClose={closeDrawer}
         onOpen={openDrawer}
       >
-        <IconButton aria-label="delete" onClick={closeDrawer}>
-          <CloseIcon />
-        </IconButton>
         {populateNomsList()}
       </SwipeableDrawer>
+      <SwipeableDrawer
+        anchor="top"
+        open={submittedOpen}
+        onClose={closeSubmitted}
+        onOpen={openSubmitted}
+      >
+        <h1>
+          Submission received!
+        </h1>
+      </SwipeableDrawer>
       <pre>
-        {data.Search.map((res) => (<ResultsGrid title={res.Title} poster={res.Poster} year={res.Year} key={res.imdbID} noms={noms} setNoms={setNoms} id={res.imdbID} />))}
         <Pagination count={pages} page={page} onChange={handlePageChange} />
+        {data.Search.map((res) => (<ResultsGrid title={res.Title} poster={res.Poster} year={res.Year} key={res.imdbID} noms={noms} setNoms={setNoms} id={res.imdbID} />))}
       </pre>
     </div>
   );
