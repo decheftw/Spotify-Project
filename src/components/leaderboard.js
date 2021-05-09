@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
 export default function LeaderboardComp(props) {
   const classes = useStyles();
   const [rating, setRating] = useState('No Rating Found');
-  console.log(props);
   let {
     // eslint-disable-next-line prefer-const
     title, poster, year, id, votes,
@@ -39,10 +38,6 @@ export default function LeaderboardComp(props) {
   if (poster === 'N/A') {
     poster = NullImage;
   }
-
-  useEffect(() => {
-    console.log(rating[0]);
-  }, [rating]);
 
   useEffect(() => {
     axios.get(`https://www.omdbapi.com/?i=${id}&plot=full&apikey=948f4b34`)

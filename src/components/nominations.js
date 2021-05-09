@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
 export default function NomsList(props) {
   const classes = useStyles();
   const [rating, setRating] = useState('No Rating Found');
-  console.log(props);
   let {
     // eslint-disable-next-line prefer-const
     title, poster, year, id, noms, setNoms,
@@ -51,10 +50,6 @@ export default function NomsList(props) {
     }
     setNoms(tempNoms);
   }
-
-  useEffect(() => {
-    console.log(rating[0]);
-  }, [rating]);
 
   useEffect(() => {
     axios.get(`https://www.omdbapi.com/?i=${id}&plot=full&apikey=948f4b34`)

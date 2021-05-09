@@ -49,16 +49,16 @@ export default function ResultsGrid(props) {
   }
 
   useEffect(() => {
-    console.log(rating[0]);
-  }, [rating]);
-
-  useEffect(() => {
+    let mounted = true;
     axios.get(`https://www.omdbapi.com/?i=${id}&plot=full&apikey=948f4b34`)
       .then((response) => {
         if (response.data.Ratings.length > 0) {
-          setRating(response.data.Ratings[0].Value);
+          if (mounted === true) {
+            setRating(response.data.Ratings[0].Value);
+          }
         }
       });
+    return () => { mounted = false; };
   }, [id]);
 
   function button() {

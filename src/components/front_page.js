@@ -46,8 +46,8 @@ function Page() {
   useEffect(() => {
     axios.get(`https://www.omdbapi.com/?type=movie&s=${search}&page=${page}&apikey=948f4b34`)
       .then((response) => {
-        console.log(response.data);
         if (response.data.Response !== 'False') {
+          console.log(response.data);
           setData(response.data);
           setPages(Math.ceil(response.data.totalResults / 10));
         }
@@ -62,7 +62,6 @@ function Page() {
 
   useEffect(() => {
     const tempLeaderboard = [];
-    console.log(leaderboardData);
     // eslint-disable-next-line guard-for-in
     for (const key in leaderboardData) {
       tempLeaderboard.push(leaderboardData[key]);
@@ -72,10 +71,6 @@ function Page() {
     });
     setLeaderboard(tempLeaderboard.splice(0, 5));
   }, [leaderboardData]);
-
-  useEffect(() => {
-    console.log(leaderboard);
-  }, [leaderboard]);
 
   useEffect(() => {
     getNominationLeaders().then((res) => setLeaderboardData(res));
@@ -140,33 +135,30 @@ function Page() {
       return (
         <h1>No nominations yet!</h1>
       );
+    } else if (noms.length === 5) {
+      return (
+        <div>
+          <IconButton aria-label="delete" onClick={closeDrawer}>
+            <CloseIcon />
+          </IconButton>
+          <Button variant="contained" onClick={onSubmitClick}>Submit</Button>
+          <div>
+            {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
+          </div>
+        </div>
+      );
     } else {
-      console.log(noms);
-      if (noms.length === 5) {
-        return (
+      return (
+        <div>
+          <IconButton aria-label="delete" onClick={closeDrawer}>
+            <CloseIcon />
+          </IconButton>
+          <Button variant="contained" disabled>{`Nominations: ${noms.length}/5`}</Button>
           <div>
-            <IconButton aria-label="delete" onClick={closeDrawer}>
-              <CloseIcon />
-            </IconButton>
-            <Button variant="contained" onClick={onSubmitClick}>Submit</Button>
-            <div>
-              {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
-            </div>
+            {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
           </div>
-        );
-      } else {
-        return (
-          <div>
-            <IconButton aria-label="delete" onClick={closeDrawer}>
-              <CloseIcon />
-            </IconButton>
-            <Button variant="disabled">{`Nominations: ${noms.length}/5`}</Button>
-            <div>
-              {noms.map((nom) => (<NomsList title={nom.title} poster={nom.poster} year={nom.year} key={nom.id} noms={noms} setNoms={setNoms} id={nom.id} />))}
-            </div>
-          </div>
-        );
-      }
+        </div>
+      );
     }
   }
 
@@ -239,8 +231,5 @@ function Page() {
     </div>
   );
 }
-
-// eslint-disable-next-line no-lone-blocks
-{ /* <ResultsGrid props={res} key={res.imbdID} /> */ }
 
 export default Page;
