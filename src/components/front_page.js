@@ -7,7 +7,6 @@ import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
-import Modal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
 import ResultsGrid from './results';
 import NomsList from './nominations';
@@ -97,6 +96,10 @@ function Page() {
     setOpenBanner(false);
   }
 
+  function bannerOpen() {
+    setOpenBanner(true);
+  }
+
   function viewNomsButton() {
     closeBanner();
     openDrawer();
@@ -105,7 +108,7 @@ function Page() {
   function generateModalBody() {
     return (
       <div>
-        <h1>That&aposs your 5th nomination!</h1>
+        <h1>That&apos;s your 5th nomination!</h1>
         <Button variant="contained" onClick={closeBanner}>Cool!</Button>
         <Button variant="contained" onClick={viewNomsButton}>View my nominations</Button>
       </div>
@@ -185,14 +188,14 @@ function Page() {
       <Button variant="contained" onClick={openDrawer}>{`Nominations: ${noms.length}/5`}</Button>
       <Button variant="contained" onClick={openLeaderboard}>Leaderboard</Button>
 
-      <Modal
+      <SwipeableDrawer
         open={openBanner}
         onClose={closeBanner}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
+        onOpen={bannerOpen}
+        anchor="top"
       >
         {generateModalBody()}
-      </Modal>
+      </SwipeableDrawer>
       <SwipeableDrawer
         anchor="top"
         open={drawerOpen}
