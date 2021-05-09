@@ -44,7 +44,7 @@ function Page() {
   });
 
   useEffect(() => {
-    axios.get(`http://www.omdbapi.com/?type=movie&s=${search}&page=${page}&apikey=948f4b34`)
+    axios.get(`https://www.omdbapi.com/?type=movie&s=${search}&page=${page}&apikey=948f4b34`)
       .then((response) => {
         console.log(response.data);
         if (response.data.Response !== 'False') {

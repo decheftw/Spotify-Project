@@ -45,7 +45,7 @@ export default function LeaderboardComp(props) {
   }, [rating]);
 
   useEffect(() => {
-    axios.get(`http://www.omdbapi.com/?i=${id}&plot=full&apikey=948f4b34`)
+    axios.get(`https://www.omdbapi.com/?i=${id}&plot=full&apikey=948f4b34`)
       .then((response) => {
         if (response.data.Ratings.length > 0) {
           setRating(response.data.Ratings[0].Value);
